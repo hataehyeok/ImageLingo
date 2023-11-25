@@ -49,7 +49,6 @@ def collection_screen(collection_name):
     if st.button("뒤로가기"):
         st.session_state.page = 'main'
 
-    # 컬렉션 내용 표시
     display_collection_content(collection_name)
 
 # 컬렉션 생성 함수
