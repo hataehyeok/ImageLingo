@@ -1,24 +1,42 @@
 import streamlit as st
 import os
 import glob
+import cv2
+import pytesseract
+from PIL import Image
+import numpy as np
+
+# Tesseract 실행 파일 경로 설정
+pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'
 
 # 세션 상태 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'main'
+
+# 텍스트 추출 함수
+def extract_highlighted_text(image_path):
+    image = cv2.imread(image_path)
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    lower = np.array([20, 80, 80])
+    upper = np.array([40, 255, 255])
+    mask = cv2.inRange(hsv, lower, upper)
+    highlighted = cv2.bitwise_and(image, image, mask=mask)
+    pil_image = Image.fromarray(cv2.cvtColor(highlighted, cv2.COLOR_BGR2RGB))
+    text = pytesseract.image_to_string(pil_image)
+    return text
 
 # 메인 화면 함수
 def main_screen():
     st.session_state.page = 'main'
     st.title("ImageLingo")
 
-    # 컬렉션 생성
     with st.form(key='new_collection_form'):
         new_collection_name = st.text_input("새 컬렉션 이름:")
+        uploaded_file = st.file_uploader("이미지 업로드", type=['png', 'jpg', 'jpeg'])
         submit_button = st.form_submit_button(label='컬렉션 생성')
-        if submit_button:
-            create_collection(new_collection_name)
+        if submit_button and uploaded_file:
+            create_collection(new_collection_name, uploaded_file)
 
-    # 컬렉션 목록 표시
     collections = get_collections()
     selected_collection = st.selectbox("컬렉션 선택", collections)
     if st.button("컬렉션 보기"):
@@ -35,9 +53,25 @@ def collection_screen(collection_name):
     display_collection_content(collection_name)
 
 # 컬렉션 생성 함수
-def create_collection(collection_name):
+def create_collection(collection_name, uploaded_file):
     path = f"./collections/{collection_name}"
     os.makedirs(path, exist_ok=True)
+    os.makedirs(f"{path}/image", exist_ok=True)
+    os.makedirs(f"{path}/word", exist_ok=True)
+    os.makedirs(f"{path}/sentence", exist_ok=True)
+    os.makedirs(f"{path}/source_image", exist_ok=True)
+    os.makedirs(f"{path}/raw_string", exist_ok=True)
+
+    # 이미지 저장
+    image_path = os.path.join(path, "source_image", uploaded_file.name)
+    with open(image_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    # 추출된 텍스트 저장
+    extracted_text = extract_highlighted_text(image_path)
+    text_path = os.path.join(path, "raw_string", uploaded_file.name + ".txt")
+    with open(text_path, "w") as f:
+        f.write(extracted_text)
 
 # 컬렉션 목록 가져오기 함수
 def get_collections():
