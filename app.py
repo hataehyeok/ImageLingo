@@ -1,10 +1,10 @@
 import streamlit as st
 import os
 import glob
-import cv2
 import pytesseract
-from PIL import Image
-import numpy as np
+import src.test_analysis as test_analysis
+import src.setence_query as setence_query
+import json
 
 # Tesseract 실행 파일 경로 설정
 pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'
@@ -12,23 +12,27 @@ pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'
 # 세션 상태 초기화
 if 'page' not in st.session_state:
     st.session_state.page = 'main'
+if 'api_key' not in st.session_state:
+    st.session_state.api_key = None
 
-# 텍스트 추출 함수
-def extract_highlighted_text(image_path):
-    image = cv2.imread(image_path)
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    lower = np.array([20, 80, 80])
-    upper = np.array([40, 255, 255])
-    mask = cv2.inRange(hsv, lower, upper)
-    highlighted = cv2.bitwise_and(image, image, mask=mask)
-    pil_image = Image.fromarray(cv2.cvtColor(highlighted, cv2.COLOR_BGR2RGB))
-    text = pytesseract.image_to_string(pil_image)
-    return text
+# API 키 로드 함수
+def load_api_key(json_file):
+    try:
+        json_data = json.load(json_file)
+        return json_data.get('api_key')
+    except json.JSONDecodeError:
+        st.error("Invalid JSON file")
+        return None
 
 # 메인 화면 함수
 def main_screen():
     st.session_state.page = 'main'
     st.title("ImageLingo")
+
+    # API 키 업로드
+    api_key_file = st.file_uploader("API 키 파일 업로드 (JSON)", type=['json'])
+    if api_key_file is not None:
+        st.session_state.api_key = load_api_key(api_key_file)
 
     with st.form(key='new_collection_form'):
         new_collection_name = st.text_input("새 컬렉션 이름:")
@@ -53,7 +57,7 @@ def collection_screen(collection_name):
 
 # 컬렉션 생성 함수
 def create_collection(collection_name, uploaded_file):
-    path = f"./collections/{collection_name}"
+    path = f"./data/{collection_name}"
     os.makedirs(path, exist_ok=True)
     os.makedirs(f"{path}/image", exist_ok=True)
     os.makedirs(f"{path}/word", exist_ok=True)
@@ -67,21 +71,37 @@ def create_collection(collection_name, uploaded_file):
         f.write(uploaded_file.getbuffer())
 
     # 추출된 텍스트 저장
-    extracted_text = extract_highlighted_text(image_path)
+    vocab_list = test_analysis.extract_highlighted_text(image_path)
     text_path = os.path.join(path, "raw_string", uploaded_file.name + ".txt")
     with open(text_path, "w") as f:
-        f.write(extracted_text)
+        f.write(vocab_list)
+    
+    # 문장 생성
+    if st.session_state.api_key:
+        example_sentences = setence_query.generate_example_sentences(st.session_state.api_key, vocab_list)
+    
+        for i, sentence in enumerate(example_sentences):
+            sentence_path = os.path.join(path, "sentence", str(i) + ".txt") # Ensure file extension is added
+            with open(sentence_path, "w") as f:
+                f.write(sentence)
+
+        # 이미지 생성
+        for i, sentence in enumerate(example_sentences):
+            image_path = os.path.join(path, "image", str(i) + ".jpg") # Ensure file extension is added
+            setence_query.generate_image(st.session_state.api_key, sentence, image_path)
+    else:
+        st.error("API key is not set. Please upload the API key file.")
 
 # 컬렉션 목록 가져오기 함수
 def get_collections():
-    return os.listdir("./collections")
+    return os.listdir("./data")
 
 # 컬렉션 내용 표시 함수
 def display_collection_content(collection_name):
     # 각 디렉토리 경로 설정
-    image_path = f"./collections/{collection_name}/image"
-    word_path = f"./collections/{collection_name}/word"
-    sentence_path = f"./collections/{collection_name}/sentence"
+    image_path = f"./data/{collection_name}/image"
+    word_path = f"./data/{collection_name}/word"
+    sentence_path = f"./data/{collection_name}/sentence"
 
     # 파일 리스트 가져오기
     images = sorted(glob.glob(f"{image_path}/*"))
