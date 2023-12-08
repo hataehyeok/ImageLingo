@@ -1,0 +1,11 @@
+/* Apply a white background to the entire app */
+body {
+    background-color: white;
+}
+
+/* Styling for the title section */
+h1 {
+    background-color: mint;
+    padding: 10px;
+    border-radius: 5px;
+}
