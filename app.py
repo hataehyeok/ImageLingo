@@ -19,7 +19,7 @@ if 'api_key' not in st.session_state:
 def load_api_key(json_file):
     try:
         json_data = json.load(json_file)
-        return json_data.get('api_key')
+        return json_data.get('key')
     except json.JSONDecodeError:
         st.error("Invalid JSON file")
         return None
@@ -71,14 +71,19 @@ def create_collection(collection_name, uploaded_file):
         f.write(uploaded_file.getbuffer())
 
     # 추출된 텍스트 저장
-    vocab_list = test_analysis.extract_highlighted_text(image_path)
+    vocab = test_analysis.extract_highlighted_text(image_path)
+    vocab_list = vocab.split()
+    three_letter_words = [word for word in vocab_list if len(word) == 2]
+    # vocab_list = three_letter_words
+
     text_path = os.path.join(path, "raw_string", uploaded_file.name + ".txt")
     with open(text_path, "w") as f:
-        f.write(vocab_list)
+        f.write(vocab)
     
     # 문장 생성
     if st.session_state.api_key:
-        example_sentences = setence_query.generate_example_sentences(st.session_state.api_key, vocab_list)
+        # example_sentences = setence_query.generate_example_sentences(st.session_state.api_key, vocab_list)
+        example_sentences = setence_query.generate_example_sentences(st.session_state.api_key, three_letter_words)
     
         for i, sentence in enumerate(example_sentences):
             sentence_path = os.path.join(path, "sentence", str(i) + ".txt") # Ensure file extension is added
@@ -89,6 +94,13 @@ def create_collection(collection_name, uploaded_file):
         for i, sentence in enumerate(example_sentences):
             image_path = os.path.join(path, "image", str(i) + ".jpg") # Ensure file extension is added
             setence_query.generate_image(st.session_state.api_key, sentence, image_path)
+
+        word_path = f"./data/{collection_name}/word"
+        # for i, word in enumerate(vocab_list):
+        for i, word in enumerate(three_letter_words):
+            word_path = os.path.join(path, "word", str(i) + ".txt")
+            with open(word_path, "w") as f:
+                f.write(word)
     else:
         st.error("API key is not set. Please upload the API key file.")
 

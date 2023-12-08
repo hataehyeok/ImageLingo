@@ -19,7 +19,7 @@ def extract_highlighted_text(image_path):
 
     text = pytesseract.image_to_string(pil_image)
 
-    return text.split()
+    return text
 
 # image_path = 'fQqgl.png'
 # text = extract_highlighted_text(image_path)

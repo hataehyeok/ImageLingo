@@ -67,5 +67,29 @@ def generate_image(api_key, sentence, image_path):
     # save_path = "path_to_save_image.jpg"  # Replace with your desired path and file name
     download_image(image_url, image_path)
 
+
+def generate_image(api_key, sentence, image_path):
+    openai.api_key = api_key
+    try:
+        image_prompt = GPT4Query(GPT_Prompt_Generator, "Generate prompts using the sentence : " + sentence, [])
+        response = openai.Image.create(
+            model="dall-e-3",
+            prompt=image_prompt,
+            size="1024x1024",
+            quality="standard",
+            n=1,
+        )
+        image_url = response.data[0].url
+        download_image(image_url, image_path)
+    except openai.error.InvalidRequestError as e:
+        # Handle the specific error
+        print(f"Image generation request rejected: {e}")
+        # Optional: Adjust the sentence or prompt and retry
+        # ...
+    except Exception as e:
+        # Handle other potential errors
+        print(f"An error occurred: {e}")
+
+        
 # for sentence in example_sentences:
 #     generate_image(api_key,sentence)
