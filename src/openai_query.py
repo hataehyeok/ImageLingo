@@ -1,5 +1,6 @@
 import openai
 import requests
+import time
 
 GPT_Sentence_Generator_Easy = [{"role": "system", "content":
                  "You are a sentence generator. You are to generate a random sentence using a word that we give you. The sentence should use the word in a context where the word can be visualized."}]
@@ -28,20 +29,11 @@ def generate_example_sentences(api_key, vocab_list):
 
     return example_sentences
 
-# # Example usage
-# api_key = "sk-qwer"
-# vocab_list = ["serendipity", "ephemeral", "solitude"]
-# example_sentences = generate_example_sentences(api_key, vocab_list)
-
 def download_image(image_url, save_path):
     try:
-        # Send a GET request to the image URL
         response = requests.get(image_url)
-
-        # Raise an exception if the request was unsuccessful
         response.raise_for_status()
 
-        # Write the content of the response to a file
         with open(save_path, 'wb') as file:
             file.write(response.content)
 
@@ -51,45 +43,36 @@ def download_image(image_url, save_path):
 
 def generate_image(api_key, sentence, image_path):
     openai.api_key = api_key
-    image_prompt = GPT4Query(GPT_Prompt_Generator, "Generate a prompts using the sentence : " + sentence, [])
- 
-    response = openai.Image.create(
-    model="dall-e-3",
-    prompt= image_prompt,
-    size="1024x1024",
-    quality="standard",
-    n=1,
-    )
+    max_retries = 3
+    retry_delay = 5
 
-    image_url = response.data[0].url
-    # print(image_url)
-    # Example usage
-    # save_path = "path_to_save_image.jpg"  # Replace with your desired path and file name
-    download_image(image_url, image_path)
+    for attempt in range(max_retries):
+        try:
+            image_prompt = GPT4Query(GPT_Prompt_Generator, "Generate prompts using the sentence : " + sentence, [])
+            response = openai.Image.create(
+                model="dall-e-3",
+                prompt=image_prompt,
+                size="1024x1024",
+                quality="standard",
+                n=1,
+            )
+            image_url = response.data[0].url
+            download_image(image_url, image_path)
+            break  # Break out of the loop if successful
+        except openai.error.InvalidRequestError as e:
+            print(f"Attempt {attempt + 1} - Image generation request rejected: {e}")
+            if attempt < max_retries - 1:  # If not the last attempt, wait and then retry
+                print(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+                # Optional: Modify the sentence or prompt before retrying
+                # sentence = modify_sentence(sentence)
+            else:
+                print("Maximum retry attempts reached. Unable to generate image.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            break  # Exit loop on other types of exceptions
 
-
-def generate_image(api_key, sentence, image_path):
-    openai.api_key = api_key
-    try:
-        image_prompt = GPT4Query(GPT_Prompt_Generator, "Generate prompts using the sentence : " + sentence, [])
-        response = openai.Image.create(
-            model="dall-e-3",
-            prompt=image_prompt,
-            size="1024x1024",
-            quality="standard",
-            n=1,
-        )
-        image_url = response.data[0].url
-        download_image(image_url, image_path)
-    except openai.error.InvalidRequestError as e:
-        # Handle the specific error
-        print(f"Image generation request rejected: {e}")
-        # Optional: Adjust the sentence or prompt and retry
-        # ...
-    except Exception as e:
-        # Handle other potential errors
-        print(f"An error occurred: {e}")
-
-        
-# for sentence in example_sentences:
-#     generate_image(api_key,sentence)
+# Define the modify_sentence function if you plan to modify the sentence for retries
+# def modify_sentence(sentence):
+#     # Logic to modify the sentence
+#     return modified_sentence
