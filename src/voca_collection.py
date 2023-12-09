@@ -50,7 +50,7 @@ def get_collections():
 def collection_screen(collection_name):
     st.title(f"{collection_name} 컬렉션")
     if st.button("뒤로가기"):
-        st.session_state.page = 'main'
+        st.session_state.page = 'collection_creation'
     display_collection_content(collection_name)
 
 

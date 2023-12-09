@@ -5,30 +5,41 @@ import src.voca_collection as voca_collection
 
 pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'
 
-def local_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-local_css("src/style.css")
-
 if 'page' not in st.session_state:
-    st.session_state.page = 'main'
+    st.session_state.page = 'login_session'
 if 'api_key' not in st.session_state:
     st.session_state.api_key = None
 
-def main_screen():
-    st.session_state.page = 'main'
+def display_logo():
     col1, col2 = st.columns([1, 6])
     with col1:
         st.image("image/logo.png")
     with col2:
-        st.markdown("<h1 style='background-color: mintcream; text-align: center; color: black;'>ImageLingo</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='background-color: hsla(167, 32%, 62%, 0.888); text-align: center; color: black;'>ImageLingo</h1>", unsafe_allow_html=True)
 
+def login_screen():
+    display_logo()
+    st.markdown("## Login")
+    st.text_input("ID")
+    st.text_input("Password", type='password')
+    if st.button("Login"):
+        st.session_state.page = 'api_key_selection'
 
-    api_key_file = st.file_uploader("API 키 파일 업로드 (JSON)", type=['json'])
+def api_key_selection_screen():
+    display_logo()
+
+    st.markdown("## API Key Selection")
+    api_key_file = st.file_uploader("Upload API Key (JSON)", type=['json'])
     if api_key_file is not None:
         st.session_state.api_key = json_query.load_api_key(api_key_file)
+    
+    if st.button("NEXT"):
+        st.session_state.page = 'collection_creation'
 
+def collection_creation_screen():
+    display_logo()
+
+    st.markdown("## Create a New Collection")
     with st.form(key='new_collection_form'):
         new_collection_name = st.text_input("새 컬렉션 이름:")
         uploaded_file = st.file_uploader("이미지 업로드", type=['png', 'jpg', 'jpeg'])
@@ -42,7 +53,12 @@ def main_screen():
         st.session_state.collection_name = selected_collection
         st.session_state.page = 'collection'
 
-if st.session_state.page == 'main':
-    main_screen()
+# Page Routing
+if st.session_state.page == 'login_session':
+    login_screen()
+elif st.session_state.page == 'api_key_selection':
+    api_key_selection_screen()
+elif st.session_state.page == 'collection_creation':
+    collection_creation_screen()
 elif st.session_state.page == 'collection' and 'collection_name' in st.session_state:
     voca_collection.collection_screen(st.session_state.collection_name)

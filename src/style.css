@@ -1,11 +1,11 @@
 /* Apply a white background to the entire app */
 body {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.651);
 }
 
 /* Styling for the title section */
 h1 {
-    background-color: mint;
+    background-color: hsla(167, 32%, 62%, 0.888);
     padding: 10px;
     border-radius: 5px;
 }
