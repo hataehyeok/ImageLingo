@@ -3,7 +3,7 @@ import os
 import glob
 import src.test_analysis as test_analysis
 import src.openai_query as openai_query
-
+import src.background as bg
 
 def create_collection(collection_name, uploaded_file):
     path = f"./data/{collection_name}"
@@ -48,6 +48,7 @@ def get_collections():
 
 
 def collection_screen(collection_name):
+    bg.display_logo()
     st.title(f"{collection_name}")
     if st.button("Back"):
         st.session_state.page = 'collection_creation'
