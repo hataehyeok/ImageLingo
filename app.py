@@ -25,7 +25,7 @@ def login_screen():
 def api_key_selection_screen():
     design_page.display_logo()
 
-    st.markdown("## API Key Selection")
+    design_page.display_centered_markdown("API Key Selection")
     api_key_file = st.file_uploader("Upload API Key (JSON)", type=['json'])
     if api_key_file is not None:
         st.session_state.api_key = json_query.load_api_key(api_key_file)
