@@ -41,15 +41,15 @@ def collection_creation_screen():
 
     st.markdown("## Create a New Collection")
     with st.form(key='new_collection_form'):
-        new_collection_name = st.text_input("새 컬렉션 이름:")
-        uploaded_file = st.file_uploader("이미지 업로드", type=['png', 'jpg', 'jpeg'])
-        submit_button = st.form_submit_button(label='컬렉션 생성')
+        new_collection_name = st.text_input("Create a new collection")
+        uploaded_file = st.file_uploader("Upload Image", type=['png', 'jpg', 'jpeg'])
+        submit_button = st.form_submit_button(label='Create Collection')
         if submit_button and uploaded_file:
             voca_collection.create_collection(new_collection_name, uploaded_file)
 
     collections = voca_collection.get_collections()
-    selected_collection = st.selectbox("컬렉션 선택", collections)
-    if st.button("컬렉션 보기"):
+    selected_collection = st.selectbox("Select Collection", collections)
+    if st.button("Enter Collection"):
         st.session_state.collection_name = selected_collection
         st.session_state.page = 'collection'
 

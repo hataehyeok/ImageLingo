@@ -3,7 +3,6 @@ import pytesseract
 from PIL import Image
 import numpy as np
 
-# text 추출 함수
 def extract_highlighted_text(image_path):
     image = cv2.imread(image_path)
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
