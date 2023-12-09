@@ -1,9 +1,9 @@
 import streamlit as st
 import os
 import glob
-import src.test_analysis as test_analysis
+import src.word_extract as word_extract
 import src.openai_query as openai_query
-import src.background as bg
+import src.design_page as design_page
 
 def create_collection(collection_name, uploaded_file):
     path = f"./data/{collection_name}"
@@ -17,7 +17,7 @@ def create_collection(collection_name, uploaded_file):
     with open(image_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    vocab = test_analysis.extract_highlighted_text(image_path)
+    vocab = word_extract.extract_highlighted_text(image_path)
     vocab_list = vocab.split()
     print("vocabularies list")
     print(vocab)
@@ -48,8 +48,8 @@ def get_collections():
 
 
 def collection_screen(collection_name):
-    bg.display_logo()
-    st.title(f"{collection_name}")
+    design_page.display_logo()
+    design_page.display_centered_markdown(f"{collection_name}")
     if st.button("Back"):
         st.session_state.page = 'collection_creation'
     display_collection_content(collection_name)
@@ -70,12 +70,21 @@ def display_collection_content(collection_name):
     for i in range(min_length):
         image, word, sentence = images[i], words[i], sentences[i]
 
-        st.image(image, caption=f"Image {i}")
+        _, col2, _ = st.columns([1, 6, 1])
+        with col2:
+            st.image(image, caption=f"Image {i}")
 
-        with open(word, 'r') as file:
-            word_content = file.read()
-        st.write(f"Word {i}: {word_content}")
+            with open(word, 'r') as file:
+                word_content = file.read()
+            # st.write(f"Word {i}: {word_content}")
 
-        with open(sentence, 'r') as file:
-            sentence_content = file.read()
-        st.write(f"Sentence {i}: {sentence_content}")
+            with open(sentence, 'r') as file:
+                sentence_content = file.read()
+            # st.write(f"Sentence {i}: {sentence_content}")
+            st.markdown(f"""
+                <div style="background-color: white; border: 1px solid #ccc; padding: 10px; 
+                            border-radius: 5px; margin: 10px 0;">
+                    <p style="font-weight: bold; font-size: 18px;"> {word_content}</p>
+                    <p style="font-weight: bold; font-size: 18px;"> {sentence_content}</p>
+                </div>
+                """, unsafe_allow_html=True)

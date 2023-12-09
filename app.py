@@ -2,7 +2,7 @@ import streamlit as st
 import pytesseract
 import src.json_query as json_query
 import src.voca_collection as voca_collection
-import src.background as bg
+import src.design_page as design_page
 
 pytesseract.pytesseract.tesseract_cmd = '/opt/homebrew/bin/tesseract'
 
@@ -12,19 +12,18 @@ if 'api_key' not in st.session_state:
     st.session_state.api_key = None
 
 def login_screen():
-    bg.display_logo()
-
+    design_page.display_logo()
     _, col2, _ = st.columns([1, 6, 1])
-
     with col2:
-        st.markdown("## Login")
+        design_page.display_centered_markdown("Login")
         st.text_input("ID")
         st.text_input("Password", type='password')
         if st.button("Login"):
             st.session_state.page = 'api_key_selection'
 
+
 def api_key_selection_screen():
-    bg.display_logo()
+    design_page.display_logo()
 
     st.markdown("## API Key Selection")
     api_key_file = st.file_uploader("Upload API Key (JSON)", type=['json'])
@@ -35,9 +34,9 @@ def api_key_selection_screen():
         st.session_state.page = 'collection_creation'
 
 def collection_creation_screen():
-    bg.display_logo()
+    design_page.display_logo()
 
-    st.markdown("## Create a New Collection")
+    design_page.display_centered_markdown("Welcome to Image Lingo")
     with st.form(key='new_collection_form'):
         new_collection_name = st.text_input("Create a new collection")
         uploaded_file = st.file_uploader("Upload Image", type=['png', 'jpg', 'jpeg'])

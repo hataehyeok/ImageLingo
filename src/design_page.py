@@ -20,8 +20,9 @@ def display_logo():
     background_image_path = "image/background.png"
     add_bg_image_from_local(background_image_path)
 
-    col1, col2 = st.columns([1, 6])
-    with col1:
-        st.image("image/logo.png")
+    _, col2, _ = st.columns([1, 6, 1])
     with col2:
-        st.markdown("<h1 text-align: center; color: black;'>ImageLingo</h1>", unsafe_allow_html=True)
+        st.image("image/logo_text.png")
+
+def display_centered_markdown(text):
+    st.markdown(f"<h1 style='text-align: center;'>{text}</h1>", unsafe_allow_html=True)
