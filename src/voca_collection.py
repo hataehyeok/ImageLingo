@@ -1,9 +1,9 @@
 import streamlit as st
 import os
 import glob
-import src.word_extract as word_extract
 import src.openai_query as openai_query
 import src.design_page as design_page
+import src.image_to_text as image_to_text
 
 def create_collection(collection_name, uploaded_file):
     path = f"./data/{collection_name}"
@@ -17,7 +17,7 @@ def create_collection(collection_name, uploaded_file):
     with open(image_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    vocab = word_extract.extract_highlighted_text(image_path)
+    vocab = image_to_text.extract_voca_list(image_path)
     vocab_list = vocab.split()
     print("vocabularies list")
     print(vocab)
