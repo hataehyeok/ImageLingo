@@ -1,5 +1,3 @@
-
-import pprint
 import pytesseract
 from pytesseract import Output
 import cv2
@@ -41,8 +39,8 @@ def threshold_image(img_src):
 
 def mask_image(img_src, lower, upper):
     img_hsv = cv2.cvtColor(img_src, cv2.COLOR_BGR2HSV)
-    hsv_lower = np.array(lower, np.uint8)  # Lower HSV value
-    hsv_upper = np.array(upper, np.uint8)  # Upper HSV value
+    hsv_lower = np.array(lower, np.uint8)
+    hsv_upper = np.array(upper, np.uint8)
 
     img_mask = cv2.inRange(img_hsv, hsv_lower, hsv_upper)
 
