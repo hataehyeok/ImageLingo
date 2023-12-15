@@ -3,7 +3,7 @@ import os
 import glob
 import src.openai_query as openai_query
 import src.design_page as design_page
-import src.image_to_text as image_to_text
+import src.generate_voca_list as generate_voca_list
 
 def create_collection(collection_name, uploaded_file):
     path = f"./data/{collection_name}"
@@ -17,7 +17,7 @@ def create_collection(collection_name, uploaded_file):
     with open(image_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    vocab = image_to_text.extract_voca_list(image_path)
+    vocab = generate_voca_list.extract_voca_list(image_path)
     vocab_list = vocab.split()
     print("vocabularies list")
     print(vocab)
