@@ -20,14 +20,16 @@ def create_collection(collection_name, uploaded_file):
     with open(image_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    vocab = generate_voca_list.extract_voca_list(image_path)
+    (vocab, target_lang) = generate_voca_list.extract_voca_list(image_path)
+    print(target_lang)
+
     vocab_list = vocab.split()
     print("vocabularies list")
     print(vocab)
     print(vocab_list)
     
     if st.session_state.api_key:
-        example_sentences = openai_query.generate_example_sentences(st.session_state.api_key, vocab_list)
+        example_sentences = openai_query.generate_example_sentences(st.session_state.api_key, vocab_list, target_lang)
     
         for i, sentence in enumerate(example_sentences):
             sentence_path = os.path.join(path, "sentence", str(i) + ".txt")
@@ -36,7 +38,7 @@ def create_collection(collection_name, uploaded_file):
 
             translation_path = os.path.join(path, "translation", str(i) + ".txt")
             with open(translation_path, "w") as f:
-                f.write(translate.translate(sentence, "en"))
+                f.write(translate.translate(sentence, target_lang))
 
         for i, sentence in enumerate(example_sentences):
             image_path = os.path.join(path, "image", str(i) + ".jpg")

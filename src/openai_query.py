@@ -19,13 +19,13 @@ def GPT4Query(role, instruction, context):
         {"role": "assistant", "content": chat.choices[0].message.content})
     return chat.choices[0].message.content
 
-def generate_example_sentences(api_key, vocab_list):
+def generate_example_sentences(api_key, vocab_list, target_lang):
     openai.api_key = api_key
 
     example_sentences = []
 
     for word in vocab_list:
-        example_sentences.append(GPT4Query(GPT_Sentence_Generator_Easy, "Generate a sentence using the word : " + word, []))
+        example_sentences.append(GPT4Query(GPT_Sentence_Generator_Easy, "Generate a sentence using the word: " + word + "and must use this language: " + target_lang, []))
 
     return example_sentences
 
@@ -71,8 +71,3 @@ def generate_image(api_key, sentence, image_path):
         except Exception as e:
             print(f"An error occurred: {e}")
             break  # Exit loop on other types of exceptions
-
-# Define the modify_sentence function if you plan to modify the sentence for retries
-# def modify_sentence(sentence):
-#     # Logic to modify the sentence
-#     return modified_sentence

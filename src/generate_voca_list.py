@@ -4,9 +4,9 @@ import cv2
 import numpy as np
 from collections import namedtuple
 import re
+import src.langauge_detect as langauge_detect
 
 Rectangle = namedtuple('Rectangle', ['xmin', 'ymin', 'xmax', 'ymax'])
-
 
 
 class Levels:
@@ -273,8 +273,10 @@ def _extract_voca_list(args):
     print(string_ocr)
     print("\n\n")
 
+    target_lang = langauge_detect.detectLang(string_ocr)
+
     str_highlight = words_to_string(data_ocr)
-    return str_highlight
+    return (str_highlight, target_lang)
 
 def extract_voca_list(image_path):
     class Args:
