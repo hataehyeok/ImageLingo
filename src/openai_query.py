@@ -58,16 +58,14 @@ def generate_image(api_key, sentence, image_path):
             )
             image_url = response.data[0].url
             download_image(image_url, image_path)
-            break  # Break out of the loop if successful
+            break
         except openai.error.InvalidRequestError as e:
             print(f"Attempt {attempt + 1} - Image generation request rejected: {e}")
-            if attempt < max_retries - 1:  # If not the last attempt, wait and then retry
+            if attempt < max_retries - 1:
                 print(f"Retrying in {retry_delay} seconds...")
                 time.sleep(retry_delay)
-                # Optional: Modify the sentence or prompt before retrying
-                # sentence = modify_sentence(sentence)
             else:
                 print("Maximum retry attempts reached. Unable to generate image.")
         except Exception as e:
             print(f"An error occurred: {e}")
-            break  # Exit loop on other types of exceptions
+            break

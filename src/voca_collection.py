@@ -5,6 +5,7 @@ import src.openai_query as openai_query
 import src.design_page as design_page
 import src.generate_voca_list as generate_voca_list
 import src.translate as translate
+import src.level_adjust as level_adjust
 
 
 def create_collection(collection_name, uploaded_file):
@@ -15,6 +16,7 @@ def create_collection(collection_name, uploaded_file):
     os.makedirs(f"{path}/sentence", exist_ok=True)
     os.makedirs(f"{path}/translation", exist_ok=True)
     os.makedirs(f"{path}/source_image", exist_ok=True)
+    os.makedirs(f"{path}/target_lang", exist_ok=True)
 
     image_path = os.path.join(path, "source_image", uploaded_file.name)
     with open(image_path, "wb") as f:
@@ -22,6 +24,9 @@ def create_collection(collection_name, uploaded_file):
 
     (vocab, target_lang) = generate_voca_list.extract_voca_list(image_path)
     print(target_lang)
+
+    with open(os.path.join(path, "target_lang", "target_lang.txt"), "w") as f:
+        f.write(target_lang)
 
     vocab_list = vocab.split()
     print("vocabularies list")
@@ -69,12 +74,12 @@ def display_collection_content(collection_name):
     image_path = f"./data/{collection_name}/image"
     word_path = f"./data/{collection_name}/word"
     sentence_path = f"./data/{collection_name}/sentence"
-    traslation_path = f"./data/{collection_name}/translation"
+    translation_path = f"./data/{collection_name}/translation"
 
     images = sorted(glob.glob(f"{image_path}/*"))
     words = sorted(glob.glob(f"{word_path}/*"))
     sentences = sorted(glob.glob(f"{sentence_path}/*"))
-    trans_list = sorted(glob.glob(f"{traslation_path}/*"))
+    trans_list = sorted(glob.glob(f"{translation_path}/*"))
 
     min_length = min(len(images), len(words), len(sentences), len(trans_list))
 
@@ -93,25 +98,35 @@ def display_collection_content(collection_name):
 
             with open(sentence, 'r') as file:
                 sentence_content = file.read()
-            
+
             with open(trans_word, 'r') as file:
                 trans_word_content = file.read()
+            
+            with open(f"./data/{collection_name}/target_lang/target_lang.txt", 'r') as file:
+                target_lang = file.read()
 
             st.markdown(f"""
                 <div style="background-color: white; border: 1px solid #ccc; padding: 10px; 
                             border-radius: 5px; margin: 10px 0;">
-                    <p style="font-weight: bold; font-size: 18px;"> {word_content}</p>
-                    <p style="font-weight: bold; font-size: 18px;"> {sentence_content}</p>
+                    <p style="font-weight: bold; font-size: 18px;">{word_content}</p>
+                    <p style="font-weight: bold; font-size: 18px;">{sentence_content}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-            if st.button(f"Show/Hide Traslate {i}", key=f"button_{i}"):
+            if st.button(f"Show/Hide Translate {i}", key=f"button_{i}"):
                 st.session_state.show_contents[i] = not st.session_state.show_contents[i]
 
             if st.session_state.show_contents[i]:
                 st.markdown(f"""
                 <div style="background-color: white; border: 1px solid #ccc; padding: 10px; 
                             border-radius: 5px; margin: 10px 0;">
-                    <p style="font-weight: bold; font-size: 18px;"> {trans_word_content}</p>
+                    <p style="font-weight: bold; font-size: 18px;">{trans_word_content}</p>
                 </div>
                 """, unsafe_allow_html=True)
+            
+            if st.button(f"Make Easier {i}", key=f"easier_{i}"):
+                level_adjust.makeEasier(collection_name, sentence_content, word_content, i, target_lang)
+            
+            if st.button(f"Make Harder {i}", key=f"harder_{i}"):
+                level_adjust.makeHarder(collection_name, sentence_content, word_content, i, target_lang)
+            
