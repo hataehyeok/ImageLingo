@@ -6,7 +6,7 @@ import src.design_page as design_page
 import src.generate_voca_list as generate_voca_list
 import src.translate as translate
 import src.level_adjust as level_adjust
-
+import re
 
 def create_collection(collection_name, uploaded_file):
     path = f"./data/{collection_name}"
@@ -39,6 +39,7 @@ def create_collection(collection_name, uploaded_file):
         for i, sentence in enumerate(example_sentences):
             sentence_path = os.path.join(path, "sentence", str(i) + ".txt")
             with open(sentence_path, "w") as f:
+                sentence = re.sub(r'[^\w]', ' ', sentence)
                 f.write(sentence)
 
             translation_path = os.path.join(path, "translation", str(i) + ".txt")
