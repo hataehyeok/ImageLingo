@@ -1,13 +1,33 @@
-# ImageLingo
+# ImageLingo: Text-Image Pair Generation for Language Learners
 
-ImageLingo is a Streamlit-based web application designed to create and manage collections of images, words, and sentences extracted from images using Optical Character Recognition (OCR). It provides a user-friendly interface for uploading images, extracting highlighted text, and generating example sentences and corresponding images.
+## Authors
 
-## Features
+- Suwon Yoon, Undergraduate, POSTECH
+- Taehyeok Ha, Undergraduate, POSTECH
 
-- **API Key Upload**: Securely upload your API key in JSON format.
-- **Collection Creation**: Create new collections of images and extracted text.
-- **Collection Browsing**: Browse through existing collections and view images, words, and example sentences.
-- **Responsive Design**: With a background image and a clean UI, enjoy a responsive design that adapts to different screen sizes.
+## Introduction
+
+This paper introduces ImageLingo, a platform designed for language learning through automated generation of contextually and visually accurate sentence-image pairs. Utilizing GPT-4 API and Stable Diffusion XL/DALL-E 3, it offers a transformative learning experience. 
+
+## System Architecture
+
+The ImageLingo platform is built with a modular architecture, comprising the following components:
+
+![Alt text](image.png)
+
+1. **User Input Module**: This component is responsible for capturing user inputs, which could be specific vocabulary words, phrases, or expressions. The interface is designed to be intuitive and easy to use, encouraging users to interact and specify their learning focus.
+
+2. **Sentence Generation Module**: Leveraging the capabilities of GPT-4, this module generates sentences that contextually fit the user-provided vocabulary or expressions. The AI-driven sentence generation ensures variety and relevance, providing users with realistic examples of how words or phrases can be used.
+
+3. **Image Generation Module**: This part of the system employs Stable Diffusion XL and DALL-E 3 to create visual representations of the generated sentences. The images are not only visually appealing but also contextually tied to the sentences, enhancing the learning experience by providing a visual context.
+
+4. **Translation Module**: Integrating the Papago API, this module offers multilingual translation of the generated sentences. This is particularly useful for users who are learning a language different from their native one, as it provides a reliable translation for better understanding.
+
+5. **Unified Display Interface**: The final component is the user interface, which is designed to be clean, intuitive, and user-friendly. It displays the generated sentences and corresponding images side by side, along with translations, creating an immersive learning environment.
+
+## Conclusion
+
+ImageLingo exemplifies the integration of advanced technologies in language learning. By combining AI with user-centered design, it provides a tailored, engaging, and effective educational tool.
 
 ## Installation
 
@@ -16,8 +36,8 @@ To run Image Lingo on your local machine, you need to have Python installed. Fol
 1. Clone the repository
 
     ```bash
-    git clone https://github.com/your-username/image-lingo.git
-    cd image-lingo
+    git clone https://github.com/hataehyeok/ImageLingo.git
+    cd ImageLingo
     ```
 
 2. Install the required Python packages
@@ -31,29 +51,6 @@ To run Image Lingo on your local machine, you need to have Python installed. Fol
     ```bash
     streamlit run app.py
     ```
-
-## Usage
-
-Upon launching the app, you will be greeted with a login screen. After logging in, you can:
-
-- Upload an API key file to authenticate.
-- Create new collections by uploading images.
-- Select and view existing collections.
-
-### Login Screen
-
-The login screen is the entry point of the application. Enter your credentials to proceed to the main features.
-
-### API Key Selection
-
-For features that require external API interaction, upload your API key in JSON format.
-
-### Collection Management
-
-Create and manage your collections:
-
-- Create Collection: Upload an image to create a new collection.
-- View Collection: Select from existing collections to view details.
 
 ## Development
 
